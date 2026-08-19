@@ -1,0 +1,8 @@
+ebooklib
+beautifulsoup4
+lxml
+azure-cognitiveservices-speech
+python-dotenv
+fastapi
+uvicorn[standard]
+python-multipart
