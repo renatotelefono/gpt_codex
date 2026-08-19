@@ -1,14 +1,16 @@
 import os
-from pathlib import Path
 
 import azure.cognitiveservices.speech as speechsdk
 from dotenv import load_dotenv
 
 load_dotenv()
 
-
 SPEECH_KEY = os.getenv("SPEECH_KEY")
 SPEECH_REGION = os.getenv("SPEECH_REGION")
+SPEECH_VOICE = os.getenv(
+    "SPEECH_VOICE",
+    "it-IT-IsabellaNeural"
+)
 
 
 def create_speech_config():
@@ -23,9 +25,9 @@ def create_speech_config():
         region=SPEECH_REGION,
     )
 
-    # MP3 24 kHz / 160 kbps
     config.set_speech_synthesis_output_format(
-        speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
+        speechsdk.SpeechSynthesisOutputFormat
+        .Audio24Khz160KBitRateMonoMp3
     )
 
     return config
@@ -34,11 +36,10 @@ def create_speech_config():
 def text_to_mp3(
     text: str,
     output_path: str,
-    voice: str = "it-IT-IsabellaNeural",
 ):
     speech_config = create_speech_config()
 
-    speech_config.speech_synthesis_voice_name = voice
+    speech_config.speech_synthesis_voice_name = SPEECH_VOICE
 
     audio_config = speechsdk.audio.AudioOutputConfig(
         filename=output_path
@@ -55,8 +56,9 @@ def text_to_mp3(
         return True
 
     if result.reason == speechsdk.ResultReason.Canceled:
-        cancellation = speechsdk.SpeechSynthesisCancellationDetails.from_result(
-            result
+        cancellation = (
+            speechsdk.SpeechSynthesisCancellationDetails
+            .from_result(result)
         )
 
         raise RuntimeError(
